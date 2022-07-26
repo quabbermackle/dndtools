@@ -97,11 +97,20 @@ currency = {'copper piece':     '1 cp', # standard, square copper w/ center hole
             }
 
 def dice(sides=6, num=1):
+    # random roll of n dice with s sides each
     tot = 0
     for _ in range(num): tot += rng.choice(list(range(1, sides+1)))
     return tot
 
 def roll(string='1d6', avgroll=False, maxroll=False):
+    """
+    nds(+/-/xC) string is parsed as
+        n dice
+        s sides
+        plus/minus/times constant C
+    avgroll returns the calculated average result
+    maxroll returns the maximum possible result
+    """
     split = string.rpartition('d')
     num = int(split[0])
     sides = split[-1]
@@ -134,7 +143,7 @@ def roll(string='1d6', avgroll=False, maxroll=False):
         const = 0
         mult = 1
     
-    if avgroll:     result = num * (sides/2)
+    if avgroll:     result = num * (sum(list(range(1,sides+1)))/sides)
     elif maxroll:   result = num * sides
     else:           result = dice(sides, num)
     
@@ -1336,6 +1345,8 @@ books = ['Tome titled "The Tale of Zord, Mightiest of the Yak Folk"',
          'A massive book with a strange starlike rune emblazoned upon the cover',
          'The text within this set of five books changes each time they are opened',
          ]
+trinket['Books'] = books # add list of books to trinket dictionary
+alltrinkets.append(books) # append list of books to list of all trinkets
 
 #%% Gems
 
@@ -2208,3 +2219,73 @@ def campaign_treasure():
     for _ in range(0, 18): hoard_treasure('CR 5-10')
     for _ in range(0, 12): hoard_treasure('CR 11-16')
     for _ in range(0, 8): hoard_treasure('CR 17+')
+
+#%% Fizban's tables
+    
+coin_origins_list = ['Equivalent value in trade goods rather than coins',
+                     'Coins from an ancient culture local to this region, ancestral to the people who live here now',
+                     'Coins from an ancient culture in a distant region',
+                     'Coins from a nearby contemporary culture',
+                     'Coins from a local contemporary culture',
+                     'Coins from another world']
+coin_origins_w = [1, 3, 5, 7, 9, 10]
+
+def coin_origins(): return rng.choices(coin_origins_list, cum_weights=coin_origins_w)
+
+# dragon hoard contents by age category:
+                    # coins:   CP, SP, EP, GP, PP
+                    # loot:    num mundane, num gems, num art objects, num magic items
+dhoard = {}
+dhoard['Wyrmling'] = {'Coins': ['12d6x100', '6d6x100', '0d0', '4d6x10', '0d0'],
+                      'Loot': ['1d6', '2d8', '1d4', '1d8']
+                      }
+dhoard['Young'] =    {'Coins': ['12d6x100', '4d6x1000', '0d0', '12d6x100', '6d6x10'],
+                      'Loot': ['1d8', '6d6', '2d4', '1d8']
+                      }
+dhoard['Adult'] =    {'Coins': ['12d6x100', '4d6x1000', '0d0', '8d6x1000', '10d6x100'],
+                      'Loot': ['2d6', '6d6', '3d6', '1d8']
+                      }
+dhoard['Ancient'] =  {'Coins': ['12d6x100', '4d6x1000', '0d0', '6d6x10000', '12d6x1000'],
+                      'Loot': ['2d8', '6d6', '2d10', '2d6']
+                      }
+
+# mundane items in a dragon's hoard:
+mundane = [ 'A painting by an artist long forgotten by everyone except the dragon',
+            'A hogshead (large cask) containing 65 gallons of clean drinking water',
+            'Several embroidered throw pillows depicting wyrmling dragons',
+            'A funerary urn containing remains the dragon can''t identify',
+            'A set of seven candlesticks bearing a god''s holy symbol',
+            'A tarnished brazier with pleasant-smelling ash',
+            'A drum for use in religious rites, with a foreboding echo to its beat',
+            'A stuffed Monstrosity appropriate to the local terrain',
+            'The skull of a Fiend or Celestial',
+            'A spinning wheel',
+            'An hourglass filled with sparkling sand',
+            'A crude flute with a pleasing sound',
+            'Hundreds or thousands of fake coins interspersed with the real treasure',
+            'A treatise on alchemy etched on steel cylinders',
+            'The battle standard of one of the dragon''s ancient foes',
+            'A sketchbook from another world of the Material Plane, depicting unfamiliar creatures and one very familiar dragon',
+            'A set of irregular polyhedral dice (with 9, 13, 25, and 34 sides)',
+            'A map showing the dragon''s lair in relation to villages and other long-gone landmarks',
+            'A kneeling bench, which anyone addressing the dragon is required to use',
+            'A scroll containing a long epic poem in praise of the dragon',
+            'A star chart showing Bahamut and a one-headed Tiamat as constellations, with "Elegy for the First World" written between the stars',
+            'A large, noisy wind chime',
+            'A small shrine with a statuette, a brazier, and an altar dedicated to a god worshiped by many of the dragon''s minions',
+            'A jar with a dead illithid tadpole floating in preserving chemicals',
+            'An extensive historical record in the form of carefully knotted strings']
+mundane_w = [4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96,100]
+trinket['Draconic': mundane] # add to dictionary of trinkets
+alltrinkets.append(mundane) # add to master list of all trinkets
+
+# gem contents of a dragon's hoard by age category:
+# weights correspond to values in the 'gemvals' list
+#                   gp:  10, 50, 100, 500, 1000, 5000
+hgems_w = {'Wyrmling':  [43, 99, 100, 100, 100,  100],
+           'Young':     [51, 75, 99,  100, 100,  100],
+           'Adult':     [18, 36, 54,  77,  99,   100],
+           'Ancient':   [14, 28, 42,  58,  93,   100]}
+
+
+
