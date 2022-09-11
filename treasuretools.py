@@ -1346,7 +1346,8 @@ books = ['Tome titled "The Tale of Zord, Mightiest of the Yak Folk"',
          'The text within this set of five books changes each time they are opened',
          ]
 trinket['Books'] = books # add list of books to trinket dictionary
-alltrinkets.append(books) # append list of books to list of all trinkets
+for i in range(len(books)):
+    alltrinkets.append(books[i]) # append list of books to list of all trinkets
 
 #%% Gems
 
@@ -1519,9 +1520,24 @@ art['7500 gp'] = ['Jeweled gold crown',
                   'Bejeweled ivory drinking horn with gold filigree']
 artvals = ['25 gp', '250 gp', '750 gp', '2500 gp', '7500 gp']
 
-def art_treasure(artval='random'):
+def art_treasure(artval='random', dtype='none'):
+    """
+    artval = gp value of art: 25 gp, 250 gp, 750 gp, 2500 gp, or 7500 gp
+    dtype = type of dragon to pick from: dragontypes, none, or random
+    """
     if artval == 'random': artval = rng.choice(artvals)
-    artchosen = rng.choice(art[artval])
+    if dtype == 'none':
+        artchosen = rng.choice(art[artval]) # choose from regular art objects
+    elif dtype in dragontypes:
+        artchosen = rng.choice(dart[dtype]) # choose from dragon art objects
+    elif dtype == 'random':
+        _ = rng.choice([True, False]) # random choice of dragon or regular
+        if _: # dragon
+            dtype = rng.choice(dragontypes) # random dragon type
+            artchosen = rng.choice(dart[dtype])
+        else: # regular
+            tempval = rng.choice(artvals) # random value type
+            artchosen = rng.choice(art[tempval])
     return artval + ' ' + artchosen
 
 #%% Random Magic Item tables and weights
@@ -2168,6 +2184,8 @@ hoard['CR 17+'] = {'Coins': ['0d0', '0d0', '0d0', '12d6x1000', '8d6x100'],
                    'Loot_w': [2, 5, 8, 11, 14, 22, 30, 38, 46, 52, 58, 63, 68,
                               69, 70, 71, 72, 74, 76, 78, 80, 85, 90, 95, 100]}
 
+# generate a treasure hoard for a given challenge rating
+denom = ['CP', 'SP', 'EP', 'GP', 'PP'] # coin denominations
 def hoard_treasure(CR='random'):
     
     # CR
@@ -2175,7 +2193,6 @@ def hoard_treasure(CR='random'):
     CRtext = CR + ' Treasure Hoard:\n'
     
     # Coins
-    denom = ['CP', 'SP', 'EP', 'GP', 'PP']
     cointext = 'Coins: '
     for x in range(0, len(denom)):
         coins = roll(hoard[CR]['Coins'][x])
@@ -2234,7 +2251,7 @@ def coin_origins(): return rng.choices(coin_origins_list, cum_weights=coin_origi
 
 # dragon hoard contents by age category:
                     # coins:   CP, SP, EP, GP, PP
-                    # loot:    num mundane, num gems, num art objects, num magic items
+                    # loot:    mundane, gems, art objects, magic items
 dhoard = {}
 dhoard['Wyrmling'] = {'Coins': ['12d6x100', '6d6x100', '0d0', '4d6x10', '0d0'],
                       'Loot': ['1d6', '2d8', '1d4', '1d8']
@@ -2275,9 +2292,230 @@ mundane = [ 'A painting by an artist long forgotten by everyone except the drago
             'A small shrine with a statuette, a brazier, and an altar dedicated to a god worshiped by many of the dragon''s minions',
             'A jar with a dead illithid tadpole floating in preserving chemicals',
             'An extensive historical record in the form of carefully knotted strings']
+# note that these weights are all the same, so they're not really needed:
 mundane_w = [4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96,100]
-trinket['Draconic': mundane] # add to dictionary of trinkets
-alltrinkets.append(mundane) # add to master list of all trinkets
+trinket['Draconic'] = mundane # add to dictionary of trinkets
+for i in range(len(mundane)):
+    alltrinkets.append(mundane[i]) # add to master list of all trinkets
+
+# art objects by dragon type; can be any value
+dart = {}
+dart['Amethyst'] = ['A complex orrery of the planes of existence made of engraved movable plates of precious metals and set with gemstones',
+                    'A two-foot-long rod of pale crystal that gives off eerie sounds when touched, with the tone varying up and down the length of the rod',
+                    'A life-sized human skull carved from a single piece of crystal, including a hollow interior',
+                    'A beautifully engraved gong, 3 feet in diameter, suspended from an ornate, inlaid frame',
+                    'A crystal singing bowl etched with mantras in Gith, accompanied by an inlaid wooden mallet',
+                    'A beautifully illuminated treatise on the planes of existence, bound in ebony covers with metal corner caps and a cover boss set with polished gems',
+                    'An etched crystal that projects a star map showing an unfamiliar star field and constellations when set on top of a light source',
+                    'A ring in the shape of a coiling dragon, with tiny gemstones for eyes']
+
+dart['Black'] =    ['An elegant necklace owned by a beloved noble who disappeared years ago',
+                    'Stone carvings representing a pantheon of deities that passed from common knowledge long ago',
+                    'The lost secret to forging an alloy imbued with arcane potential, etched on twelve metal disks the size of dinner plates',
+                    'A sealed platinum flask containing the last known aqua vitae created by a master dwarf distiller',
+                    'A ceremonial longsword with an embossed silver hilt and a blade of amber',
+                    'A lavishly illustrated genealogy kept in a magically sealed container that disputes a current monarch''s right to the throne',
+                    'Heretical religious symbols carved on a trio of gemstones the size of apples',
+                    'An elaborately carved mask representing a god of harvest and fertility',
+                    'Metal horn caps inset with gems, made for the dragon by loyal cultists',
+                    'A beautifully enameled urn holding the desiccated heart of the dragon''s former green dragon rival']
+
+dart['Blue'] =     ['An intricately carved seal from a civilization that worshiped the dragon''s ancestors as gods',
+                    'An extensive collection of elaborate jewelry, including a tiara, tail rings, and claw covers, which the dragon wears when meeting with supplicants',
+                    'A set of sculptures depicting the dragon''s deceased relatives, all adorned with ground-up jewels',
+                    'A jeweled mosaic map of the dragon''s territory',
+                    'A glass bell that creates the sound of rainstorms and thunder for 1 hour when struck',
+                    'An ornately tooled tome recording the lineages of all the blue dragon families in the area',
+                    'A massive geode that contains spectacular blue, purple, and black crystals',
+                    'A blue silk fan painted with ground gems that creates a briny breeze when hung from the ceiling']
+
+dart['Brass'] =    ['A finely carved bust of a long-dead human ruler, which the dragon has named Cornelius and argues with incessantly',
+                    'An elegant locket holding a watercolor portrait of a dragonborn the dragon fondly calls Lux',
+                    'A polished platter engraved with an elaborate scene showing a person talking to a sphinx; the dragon likes to imagine being in the scene, dominating the conversation',
+                    'A sculpture depicting a pod of dolphins leaping among stone waves, all of which the dragon has named and imagines as pets',
+                    'A cameo pendant depicting a human woman the dragon calls "Bruno" and imagines to be a brilliant philosopher',
+                    'A statuette of an important deity, which the dragon calls by a diminutive version of the god''s name and baby-talks to',
+                    'A large tapestry depicting a party of elves riding stags through the woods; the dragon has named all the stags and offers condolences on their being saddled and mounted',
+                    'A sculpted bird in an ornate cage; the dragon calls the bird Fweep and sings to it',
+                    'A large mirror in a frame studded with gemstones; the dragon likes to gaze in the mirror and imagine having a mate',
+                    'An idol of an obscure minor divinity; the dragon addresses it reverently as "O mighty Froglet" (its shape is only vaguely frog-like)']
+
+dart['Bronze'] =   ['A painting of the bronze dragon alongside a human woman wearing an outdated military uniform',
+                    'An ornate, mostly complete collection of Oristene''s multi-volume Military History of the Outer Planes',
+                    'A heavy cloak of shimmering blue scales, with an attached half-mask',
+                    'An oversized key of living wood, with seemingly natural whorls in the bark that form the words, "For service not forgotten"',
+                    'A dragon-sized drinking vessel crafted from a behir horn',
+                    'Framed blueprints of a siege engine called the Moonhammer',
+                    'An aquatic howdah made of sharkskin and bearing an emblem of a lonely black tower perched high atop a sea stack',
+                    'A statue of a dishonored elf general, which is surrounded by historical treatises recounting the general''s disgrace and notes that suggest the dragon has vowed to redeem this former hero',
+                    'An idol of an insectile devil, with a blindfold tied carefully around its compound eyes',
+                    'An elaborate clockwork zoetrope that, when activated, displays a moving picture of a bronze dragon fighting a red dragon over a burning city']
+
+dart['Copper'] =   ['A jeweled cloak pin bearing the symbol of an ancient secret society',
+                    'A smooth piece of amber with what appears to be a tiny sprite frozen inside it',
+                    'A metal egg that unfolds into a lotus-like flower',
+                    'A harp that plays by itself on command',
+                    'A six-foot-tall mirror of silvered glass in a precious frame carved with the shapes of coiling dragons',
+                    'A complex puzzle box made of rare woods and inlaid with stone',
+                    'The figurehead of a ship, carved in rare woods and set with gemstones — and bearing the likeness of the copper dragon''s head',
+                    'A complex astrological clock, with tiny gemstones marking out stars and constellations']
+
+dart['Crystal'] =  ['An armillary sphere revealing the positions of several unknown worlds in the Material Plane (relative to the one the dragon is on)',
+                    'A set of handmade tarokka cards depicting the various wizard clans of a magocracy called Glantri',
+                    'A dazzling array of crystals carved to refract any light passing through them into star-like patterns',
+                    'An oversized monocle custom-made for the crystal dragon, who thinks it looks stylish',
+                    'A children''s coin bank shaped like an owlbear, with beautiful blue gemstone eyes',
+                    'An ancient water clock that tells the time with perfect accuracy',
+                    'A star chart reproducing the night sky of some other Material Plane world',
+                    'A magnificent fresco depicting a noble court in the Feywild',
+                    'Alabaster panels etched with unusual glyphs, designed to be hung in windows to catch the light',
+                    'Astrological birth charts for every year since the dragon was born',
+                    'A vast number of colored glass bottles collected from dozens of cultures and historical periods',
+                    'A fine divan set with gemstone buttons and stitched with silver thread']
+
+dart['Deep'] =     ['A statue of an unknown winged antelope-like creature carved from a single massive opal',
+                    'A preserved juvenile purple worm on an ebony stand set with amethysts',
+                    'A cunningly worked metal automaton of a sphinx that, when addressed directly, answers every question with a question referencing forgotten civilizations',
+                    'A set of filigreed gold claw covers set with gems that change color according to the wearer''s mood',
+                    'A silver pelt that belonged to a long-extinct species of bear and sheds snowflakes when touched',
+                    'A painting of a caldera island with unique fauna that shows how to access the interior by swimming through an underwater cave',
+                    'A magic chandelier that projects images of the most inaccessible places in the world on the wall, changing the images each time the chandelier is relit',
+                    'A magical goblet activated when the creature holding it speaks the name of a country, whereupon the goblet fills with the finest wine from that land''s vineyards',
+                    'A set of exquisite miniature dragons made of precious metals, jewels, and stone, with one representing each kind of chromatic, metallic, and gem dragon',
+                    'The jewel-encrusted skull of an ancient dragon, which the deep dragon always keeps close at hand and talks to when lonely',
+                    'A magnificent set of drums painted with scenes from the folklore of an isolated mountain community',
+                    'A beautifully worked statue of the deep dragon in a favorite Humanoid form, made by an artist the dragon knew centuries ago']
+
+dart['Dragon Turtle'] = ['An elven coronet, which the dragon turtle wears as an earring',
+                    'A pipe organ that the dragon turtle refers to as "Bubbles," which works underwater',
+                    'Cast-metal masks painted with the faces of rulers whose names the dragon turtle constantly misremembers',
+                    'A zither fashioned from a conch shell, which the dragon turtle insists visitors play before granting them an audience',
+                    'A painted egg decorated with glittering jewels',
+                    'An ornate underwater carriage fashioned from coral and seashells, which the dragon turtle pushes back and forth like a toy',
+                    'A sculpture depicting a knight on griffonback, whose lance the dragon turtle uses to scrape off barnacles',
+                    'An urn engraved with a scowling dwarf''s face, whose expression the dragon turtle mimics comically',
+                    'A scepter fashioned to resemble a skeletal arm, which unnerves the dragon turtle for some inexplicable reason',
+                    'An elegant candelabra that the dragon turtle thinks is lost, but that is actually wedged into a crack in their shell']
+
+dart['Emerald'] =  ['A traveling cloak worn by an elf apostate named Huwellah Starshine to the trial where she was convicted and executed',
+                    'A nonmagical crystal ball used by Firendelbip, a deep gnome seer who predicted the overthrow of a thousand-year-old fomorian empire',
+                    'Spurs worn by the famous human cavalier Roganvald, who challenged the dragon Arathimax the Red (Roganvald''s armor now lies in Arathimax''s hoard)',
+                    'The ornate badge of office of the lich Zakir, nine-time governor of the city of Durn',
+                    'A gravy ladle belonging to Lara Rumpledeep, a famed halfling gourmand',
+                    'A sextant used by the renowned dwarf explorer Thavrik Rustbeard',
+                    'A jeweled hairnet worn by the cloud giant Ultania, who slew her own mother to claim her throne',
+                    'A phoenix-shaped brooch passed down to each of the forty-seven recorded incarnations of Gaz, a githzerai monk',
+                    'A trophy cup engraved with a pumpkin, awarded each year at the harvest festival of Riksdell before that settlement fell to a plague',
+                    'Rusty chains used to bind the orc master thief Korjus before she escaped and conquered half the lands of the south']
+
+dart['Faerie'] =   ['A fist-sized puzzle box that the dragon hasn''t been able to open, and that holds a tiny clay tablet marked with a mysterious string of numbers',
+                    'An illustrated tome titled Hrgold''s Bestiary, which falls open to an oft-read entry on faerie dragons',
+                    'A majestic military jacket featuring a dazzling array of medals and five different secret pockets',
+                    'A gold-rimmed monocle sized for a cyclops, complete with a gold chain',
+                    'A gilded pseudodragon skull that the faerie dragon likes to wear as a mask while pretending to be a different dragon called "Regnus the Unspeakable"',
+                    'A cask of wine stamped with the seal of a noble''s private collection',
+                    'A framed painting of a red dragon destroying an army, with a hole chewed through the dragon''s face so the faerie dragon can stick their head through it',
+                    'A tiny scale model of a castle that opens like a dollhouse to reveal the chambers and secret passages within']
+
+dart['Gold'] =     ['A fine tapestry depicting the intermingled family trees of several royal bloodlines going back multiple generations — and containing surprising revelations',
+                    'An orrery showing the world''s place in the solar system — with one gemstone planet too many',
+                    'A scroll covered with surrealist imagery, entitled Voyage through the Land of Dreams',
+                    'A black dragon skull with a crack down the middle and gems fixed in its eye sockets; a plaque along the bottom reads, "So too shall ye be"',
+                    'A metal wheel with various holy symbols affixed to its edges; thin arms at the center of the wheel are made to hold a spherical object that is missing',
+                    'A series of nesting metal cylinders, each inscribed with a different proverb or paradox; the central cylinder contains a single gold dragon scale',
+                    'An elaborate atlas bound in wyvern hide, with several remote regions circled and labeled in code',
+                    'A clever clockwork music box that, when cranked, recites a prophecy in Modron',
+                    'An elaborately decorated tea set, each of its cups themed after a different plane of existence',
+                    'An elaborate calendar clock with one face burned and cracked and two others that are counting down to unspecified future events, including one less than a month away']
+
+dart['Green'] =    ['The polished skull of a unicorn, latticed with luminescent blooms',
+                    'An elaborate necklace of yuan-ti origin, set with gleaming gems and dripping with strands of pearls',
+                    'A harp, its pillar carved to resemble a beautiful elf who weeps loudly and inconsolably',
+                    'A marble statue that once showed a knight vanquishing a dragon, but due to strategic damage, now looks like a knight tumbling into massive jaws',
+                    'The baby teeth of a Humanoid, preserved in amber furred with a golden fungus that smells like gingerbread',
+                    'A giant-sized hunting horn scrimshawed with elaborate patterns, the pewter only slightly tarnished',
+                    'A stained glass window still set within a fragment of wall depicting the many deaths of an elf monarch',
+                    'A triptych of silver mirrors, set in an ornate brambled iron frame sculpted to depict figures in a grotesque bacchanal',
+                    'Quartz terrariums carried on the backs of tourmaline jaguars, overgrown with misshapen cacti',
+                    'A string of skulls riddled with too many eye sockets, their jaws replaced by carved gemstones']
+
+dart['Moonstone'] = ['A statue of a beautiful Fey who appears to be laughing, crying, or scowling, depending on the viewer''s mood; the dragon requires all who visit to describe the face and sends away anyone who sees an angry visage',
+                    'A string of leaves collected from the rarest trees in the Feywild and then dipped in silver',
+                    'A small mithral ball that shows significant scuffing, as the dragon plays with it constantly',
+                    'A mobile from which hang six figurines of pixies and sprites; the dragon insists that Fey allies address any questions and concerns to the figurines',
+                    'A painting of a beautiful Feywild vista; the dragon studies the painting every day for clues about the vista''s whereabouts',
+                    'An ornate silver chest that holds a mountain of gold coins; the dragon refuses to open the chest, claiming it can still smell the stink of the "noxious metal"',
+                    'A collection of gem-encrusted pitchers, decanters, and goblets; the dragon will not consume faerie nectar unless it is served in one of these items',
+                    'A vast bookshelf full of dream journals written by creatures the dragon has befriended over the years; the dragon has each entry illustrated by a different celebrated artist, making the library one of the largest art collections in the world']
+
+dart['Red'] =      ['A hammered metal brazier elaborately etched and set with polished obsidian, which sits atop a stand holding rare incense blends',
+                    'A beautifully inlaid mosaic map of the region within a 100-mile radius of the dragon''s lair',
+                    'A life-sized basalt statue of a fierce knight, weapon raised to strike, which might be the preserved form of an actual knight turned to stone',
+                    'The blackened skull of a young dragon that has been etched with designs and decorated with gems',
+                    'A tiered fountain filled with liquid gold that is cool to the touch, but immediately hardens if removed from the fountain',
+                    'A statue of the red dragon with gemstones for eyes',
+                    'A detailed, life-sized elf skull cast in precious metal',
+                    'A game board and a complete set of pieces, all carved and inlaid with precious and semiprecious stones (the dragon is fond of playing the game but has few worthy opponents)',
+                    'A fist-sized gemstone carved into a likeness of the dragon''s head',
+                    'A set of precious metal tablets containing ancient lore',
+                    'A beautifully wrought crown set with fiery gemstones, possibly the legacy of a lost empire',
+                    'A beautiful polished sphere of rainbow obsidian, set on a wrought-gold stand']
+
+dart['Sapphire'] = ['A battle standard showing the coat of arms of an ancient realm the dragon failed to protect',
+                    'A dragonchess set with the white knights replaced by the symbols of a war god; the board is set up for the start of a new game, and the dragon has been waiting decades for the god to make the first move',
+                    'A large tapestry depicting a bloody battle between two realms of the surface world; the dragon claims it is the tiny dragon embroidered in one corner',
+                    'A music box that plays a haunting song; the dragon claims the music is very popular on another world',
+                    'A necklace made from discarded sapphire dragon horn tips and tail barbs; the dragon refuses to say whether the pieces were donated willingly',
+                    'A perfectly polished mirror that the dragon spends hours staring into, hoping to catch glimpses into other worlds']
+
+dart['Shadow'] =   ['An ornate scepter marred by soot and grime',
+                    'A priceless painting badly in need of restoration',
+                    'A lump of melted precious metal that was once a splendid necklace and holds gemstones inside it',
+                    'A series of fine charcoal drawings depicting the royal lineage of a prominent drow house',
+                    'A seemingly plain gray tapestry; close inspection reveals a tableau in shades of dove, ash, and slate',
+                    'A pair of stonework gargoyles rendered in a grotesquely baroque and terrifying style',
+                    'A pile of loose sheet music representing the lost dirges of a famous shadar-kai bard',
+                    'An exquisitely crafted mirror that drains all color from the reflections of those who look into it',
+                    'A ventriloquist''s dummy made to resemble the Count of Barovia',
+                    'A peculiar dragonchess set entirely crafted from onyx, making it extremely difficult to tell one side''s pieces from the other']
+
+dart['Silver'] =   ['A group portrait of nobles set in a faded mahogany frame, one corner of which is etched with signatures',
+                    'An ancient shortsword with a pommel in the shape of a goblin''s face, its blade notched with heavy use',
+                    'The shattered helm of a dwarf monarch, mended with brazed gold',
+                    'A full suit of ancient armor, its breastplate scrimshawed with draconic faces',
+                    'A pearl-handled switchblade, its blade eaten away by salt water and its handle emblazoned with a crest',
+                    'An elaborate elven crown made to resemble a dragon''s head',
+                    'A triptych of tapestries depicting the end of a war, the restoration work that followed, and the sunset flight of a silver dragon leaving the renewed realm',
+                    'A cape studded with gemstones and featuring epaulets of egret feathers, set on the shoulders of a battered tailor''s mannequin',
+                    'A dramatic portrait of a human noble rendered mostly as shadow and glinting light that reveals the dragon-shaped pendant the figure wears',
+                    'A series of detailed obsidian sculptures depicting a human transitioning from childhood to old age']
+
+dart['Topaz'] =    ['An ornate statue of a sea serpent that plays ocean sounds when its gemstone eyes are pressed',
+                    'A set of seven levered brass mirrors that can be adjusted to direct light in different directions',
+                    'A stained glass window depicting a golden city whose buildings are decorated with statues of dragons and other winged creatures',
+                    'A gold scrying bowl that shows random, constantly shifting views of the Elemental Chaos',
+                    'A 10-foot-tall statue of the dragon, carved out of a single massive yellow crystal (the dragon thinks it''s flattering, except for the tail)',
+                    'A large, shallow dish filled with water on which floats a set of delicate wooden ships; speaking different command words creates waves and whirlpools in the bowl',
+                    'A large spherical gold chandelier that gives off sunlight and is surrounded by an intricate and interlocking set of glass bands engraved in an unknown language',
+                    'A set of topaz-inlaid gold claw rings engraved with the names of bronze dragons the topaz dragon has killed']
+
+dart['White'] =    ['A war horn carved to resemble a dragon''s head with a wide-open maw, which the dragon calls "Little Toot"',
+                    'A statue depicting an elf paladin with the face turned upward; the body has been defaced by the dragon''s claws',
+                    'A mammoth tusk engraved with images depicting the history of a nomadic tribe; the dragon uses the tusk to mark the spot where it has buried its pile of gold',
+                    'A giant-sized cloak decorated with silver braiding that the dragon uses as a nest lining for its egg',
+                    'A wooden throne heaped with furs; any visitors must sit on the throne while the dragon recounts the grisly death of the seat''s previous owner',
+                    'A huge wooden door carved and painted to depict a monarch enthroned with sword and scepter; the dragon occasionally raps the door with its knuckles, pauses, and then chortles, "Nobody home"',
+                    'A frost giant jarl''s crown with broken horns; the dragon enjoys perching the crown on an icy stalagmite and then knocking it off with its tail',
+                    'The prow of a ship carved to look like a pouncing lion; the dragon occasionally roars at the lion',
+                    'A gilded shield emblazoned with the holy symbol of a forgotten god; the dragon enjoys flicking the shield with a claw to hear the sound it makes',
+                    'A ceremonial anvil of dwarven make; gazing at the anvil, the dragon fondly recounts, "Seven at one blow!"',
+                    'A long, embroidered linen tapestry showing the history of an ancient realm''s civil war; the dragon "reads" the tapestry when it has trouble sleeping.',
+                    'A bell engraved with images of an angelic host, still attached to its splintered belfry; the dragon tolls the bell with its tail, growling the name of one of its defeated foes with each ring']
+
+dragontypes = ['Amethyst', 'Black', 'Blue', 'Brass', 'Bronze', 'Copper',
+               'Crystal', 'Deep', 'Dragon Turtle', 'Emerald', 'Faerie', 'Gold',
+               'Green', 'Moonstone', 'Red', 'Sapphire', 'Shadow', 'Silver',
+               'Topaz', 'White']
 
 # gem contents of a dragon's hoard by age category:
 # weights correspond to values in the 'gemvals' list
@@ -2287,5 +2525,107 @@ hgems_w = {'Wyrmling':  [43, 99, 100, 100, 100,  100],
            'Adult':     [18, 36, 54,  77,  99,   100],
            'Ancient':   [14, 28, 42,  58,  93,   100]}
 
+# art object contents of a dragon's hoard by age category:
+# weights correspond to values in the 'artvals' list
+#                   gp:  25, 250, 750, 2500, 7500
+hart_w = {'Wyrmling':   [95, 100, 100, 100,  100],
+          'Young':      [53, 99,  100, 100,  100],
+          'Adult':      [49, 75,  99,  100,  100],
+          'Ancient':    [22, 42,  58,  93,   100]}
+
+# magic item contents of a dragon's hoard by age category:
+# weights correspond to values in the 'tablenames' list
+#                 type: com, unc, rare, vr, leg, unc, rare, vr, leg
+#                table:  A,  B,  C,  D,  E,  F,  G,   H,   I
+hmagic_w = {'Wyrmling': [34, 61, 77, 77, 77, 96, 100, 100, 100],
+            'Young':    [21, 49, 64, 72, 72, 91, 97,  100, 100],
+            'Adult':    [6,  18, 41, 64, 69, 72, 80,  91,  100],
+            'Ancient':  [0,  0,  12, 56, 67, 67, 73,  82,  100]}
+
+# generate a dragon's hoard for a given age category
+agenames = ['Wyrmling', 'Young', 'Adult', 'Ancient']
+def dragon_hoard(age='random', dtype='random', typeart='only', trinket_type='Draconic', printout=False):
+    """
+    age = age of dragon: Wyrmling, Young, Adult, Ancient, or random
+    dtype = type of dragon: Amethyst, Black, Blue, Brass, Bronze, Copper,
+               Crystal, Deep, Dragon Turtle, Emerald, Faerie, Gold,
+               Green, Moonstone, Red, Sapphire, Shadow, Silver,
+               Topaz, White, or random
+    typeart = how much art to pick from type table: only, all, none, or random
+    trinket_type = trinket category: Draconic etc, or all/random
+    printout = True to print result to commandline, False to return text
+    """
+    
+    # age
+    if age == 'random': age = rng.choice(agenames)
+    
+    # type
+    if dtype == 'random': dtype = rng.choice(dragontypes)
+    if typeart != 'none':
+        if dtype == 'Dragon Turtle':
+            headertext = age + ' ' + dtype + ' Treasure Hoard:\n'
+        else:
+            headertext = age + ' ' + dtype + ' Dragon Treasure Hoard:\n'
+    
+    # Coins
+    cointext = 'Coins: '
+    for x in range(0, len(denom)):
+        coins = roll(dhoard[age]['Coins'][x])
+        if coins != 0: cointext += str(coins) + ' ' + denom[x] + ', '
+    cointext = cointext[0:-2] + '\n'
+    
+    # Mundane Items
+    nummundane = roll(dhoard[age]['Loot'][0])
+    mundanetext = 'Mundane Items:\n'
+    for _ in range(0, nummundane):
+        if trinket_type in trinket.keys(): # true if valid trinket table name
+            mundanetext += '    ' + rng.choice(trinket[trinket_type]) + '\n'
+        elif trinket_type in ['all', 'random']: # choose from all trinkets
+            mundanetext += '    ' + rng.choice(alltrinkets) + '\n'
+    if mundanetext == 'Mundane Items:\n':
+        mundanetext += 'none\n'
+    #else: mundanetext = mundanetext[0:-2] + '\n'
+    
+    # Gems
+    numgem = roll(dhoard[age]['Loot'][1])
+    gemtext = 'Gems:\n'
+    for _ in range(0, numgem):
+        gemval = rng.choices(gemvals, cum_weights=hgems_w[age])[0]
+        gemtext += '    ' + gem_treasure(gemval) + '\n'
+    if gemtext == 'Gems:\n':
+        gemtext += 'none\n'
+    #else: gemtext = gemtext[0:-2] + '\n'
+    
+    # Art Objects
+    numart = roll(dhoard[age]['Loot'][2])
+    arttext = 'Art objects:\n'
+    for _ in range(0, numart):
+        artval = rng.choices(artvals, cum_weights=hart_w[age])[0]
+        if typeart == 'only': # only art from table for dragon type
+            arttext += '    ' + art_treasure(artval, dtype) + '\n'
+        elif typeart == 'all': # art from dragon table with random type
+            temptype = rng.choice(dragontypes)
+            arttext += '    ' + art_treasure(artval, temptype) + '\n'
+        elif typeart == 'none': # regular art only
+            arttext += '    ' + art_treasure(artval) + '\n'
+        elif typeart == 'random': # random pick of dragon or regular art
+            arttext += '    ' + art_treasure(artval, 'random') + '\n'
+    if arttext == 'Art objects:\n':
+        arttext += 'none\n'
+    #else: arttext = arttext[0:-2] + '\n'
+    
+    # Magic Items
+    numitems = roll(dhoard[age]['Loot'][3])
+    itemtext = 'Magic Items:\n'
+    for _ in range(0, numitems):
+        table = rng.choices(tablenames, cum_weights=hmagic_w[age])[0]
+        itemtext += '    ' + magicitem_treasure(table) + '\n'
+    if itemtext == 'Magic Items:\n': itemtext += 'none\n'
+    #else: itemtext = itemtext[0:-2] + '\n'
+    
+    if printout:
+        print(headertext + cointext + mundanetext + gemtext + arttext + itemtext)
+    else:
+        return headertext + cointext + mundanetext + gemtext + arttext + itemtext
 
 

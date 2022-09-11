@@ -16,7 +16,7 @@ cwd = os.getcwd()
 
 from treasuretools import *
 
-#%% SETTLEMENTS BY REGION
+# SETTLEMENTS BY REGION
 
 # Settlement Sizes (5e DMG)
 maxpop5e = {'Village':1000,
@@ -61,7 +61,7 @@ bg = ['Acolyte',
       'Soldier',
       'Spy',
       'Urchin']
-bgw = list(range(1,21))
+bgw = list(range(1,len(bg)+1))
 
 # Aundairian Settlements
 totpop = {} # total population of nations
@@ -418,7 +418,7 @@ popw['end']             = list(it.accumulate([51, 23, 14, 12]))
     
 # Aerenal Settlements
 
-#%% COLLATE SETTLEMENT DATA
+# COLLATE SETTLEMENT DATA
 
 # Dict of all settlements
 all_s = {}
@@ -457,7 +457,7 @@ reg_sw['Eldeen Reaches'] = s_elw
 reg_sw['Shadow Marches'] = s_shw
 reg_sw['Demon Wastes']   = s_dew
 
-#%% HEROIC CHRONICLE TABLES
+# HEROIC CHRONICLE TABLES
 
 # List of all possible character races
 races = ['aarakocra',
@@ -1162,7 +1162,7 @@ npcclass = ['Barbarian',
             'Artificer']
 npcclassw = [1,2,4,5,7,8,9,10,13,14,15,17,20]
 
-#%% Define helper functions
+# Define helper functions
 
 def choose_region():
     region = rng.choices(list(hldict), cum_weights=hlw)[0]
@@ -1215,7 +1215,7 @@ def choose_fatemoments(nmoments=0):
         fatemoments += [rng.choice(fm)]
     return fatemoments
 
-#%% Define character object class
+# Define character object class
 
 class Character:
     def __init__(self, **preset ):
@@ -1355,4 +1355,7 @@ class Character:
             elif x[2]: print('Rival:', x[0])
         print('Acquired Relationships:')
         
-        
+if __name__=='__main__':
+  test = Character()
+  test.narrate()
+  test.stats()
